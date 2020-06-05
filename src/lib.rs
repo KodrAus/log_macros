@@ -1,34 +1,31 @@
-#![feature(min_specialization)]
+extern crate proc_macro;
 
-#[doc(hidden)]
-pub mod __private;
+#[macro_use]
+extern crate quote;
 
-#[doc(inline)]
-pub use __private::__PrivateLogCapture as Capture;
+use proc_macro2::TokenStream;
+
+#[proc_macro]
+pub fn log(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let input = TokenStream::from(item);
+
+    let output = expand_log(input);
+
+    proc_macro::TokenStream::from(output)
+}
+
+fn expand_log(_: TokenStream) -> TokenStream {
+    quote! {
+        panic!("lol")
+    }
+}
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use std::fmt;
-
     #[test]
-    fn capture_default() {
-        struct SomeType;
-
-        impl fmt::Display for SomeType {
-            fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-                write!(f, "some type")
-            }
-        }
-
-        // Capture an arbitrary `Display`
-        let _ = SomeType.capture_with_default();
-
-        // Capture a structured number
-        assert_eq!(Some(42u64), 42u64.capture_with_default().to_u64());
-
-        // Capture a borrowed string
-        let v: &str = &String::from("a string");
-        assert_eq!(Some("a string"), v.capture_with_default().to_borrowed_str());
+    fn ui() {
+        let t = trybuild::TestCases::new();
+        t.pass("tests/ui/pass/*.rs");
+        t.compile_fail("tests/ui/fail/*.rs");
     }
 }

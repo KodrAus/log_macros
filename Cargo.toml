@@ -4,6 +4,22 @@ version = "0.0.0"
 authors = ["Ashley Mannix <ashleymannix@live.com.au>"]
 edition = "2018"
 
-[dependencies.log]
-path = "../log"
-features = ["kv_unstable"]
+[lib]
+proc-macro = true
+
+[workspace]
+members = [
+    "private"
+]
+
+[dependencies.proc-macro2]
+version = "1"
+
+[dependencies.quote]
+version = "1"
+
+[dependencies.log_macros_private]
+path = "private"
+
+[dev-dependencies.trybuild]
+version = "1"
