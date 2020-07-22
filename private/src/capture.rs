@@ -67,28 +67,43 @@ captured using the same `x.method()` syntax.
 - It uses `Self` bounds on each method, and is unconditionally implemented
 so that when a bound isn't satisfied we get a more accurate type error.
 - It uses clumsily uglified names that are unlikely to clash in non-hygeinic
-contexts.
+contexts. (We're expecting non-hygeinic spans to support value interpolation)
 */
 pub trait __PrivateLogCapture {
-    fn __private_log_capture_with_default(&self) -> kv::Value where Self: Capture<WithDefault> {
+    fn __private_log_capture_with_default(&self) -> kv::Value
+    where
+        Self: Capture<WithDefault>,
+    {
         Capture::capture(self)
     }
 
-    fn __private_log_capture_from_display(&self) -> kv::Value where Self: Capture<FromDisplay> {
+    fn __private_log_capture_from_display(&self) -> kv::Value
+    where
+        Self: Capture<FromDisplay>,
+    {
         Capture::capture(self)
     }
 
-    fn __private_log_capture_from_debug(&self) -> kv::Value where Self: Capture<FromDebug> {
+    fn __private_log_capture_from_debug(&self) -> kv::Value
+    where
+        Self: Capture<FromDebug>,
+    {
         Capture::capture(self)
     }
 
-    fn __private_log_capture_as_display(&self) -> kv::Value where Self: Capture<AsDisplay> {
+    fn __private_log_capture_as_display(&self) -> kv::Value
+    where
+        Self: Capture<AsDisplay>,
+    {
         Capture::capture(self)
     }
 
-    fn __private_log_capture_as_debug(&self) -> kv::Value where Self: Capture<AsDebug> {
+    fn __private_log_capture_as_debug(&self) -> kv::Value
+    where
+        Self: Capture<AsDebug>,
+    {
         Capture::capture(self)
     }
 }
 
-impl<T: ?Sized> __PrivateLogCapture for T { }
+impl<T: ?Sized> __PrivateLogCapture for T {}
