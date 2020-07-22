@@ -1,8 +1,40 @@
+/*!
+A different string template parser.
+
+The shape of templates accepted by this crate are different from `std::fmt`.
+It doesn't have any direct understanding of formatting flags.
+Instead, it just parses field expressions between braces in a string and
+leaves it up to a consumer to decide what to do with them.
+*/
+
 use std::{fmt, iter::Peekable, str::CharIndices};
 
 use quote::ToTokens;
 use syn::FieldValue;
 use thiserror::Error;
+
+/**
+A parsed template.
+*/
+#[derive(Debug)]
+pub struct Template<'a> {
+    raw: &'a str,
+    parts: Vec<Part<'a>>,
+}
+
+/**
+A part of a parsed template.
+*/
+pub enum Part<'a> {
+    /**
+    A fragment of text.
+    */
+    Text(&'a str),
+    /**
+    A replacement expression.
+    */
+    Hole(FieldValue),
+}
 
 /**
 An error encountered while parsing a template.
@@ -45,29 +77,6 @@ impl Error {
     }
 }
 
-/**
-A parsed template.
-*/
-#[derive(Debug)]
-pub struct Args<'a> {
-    template: &'a str,
-    parts: Vec<Part<'a>>,
-}
-
-/**
-A part of a parsed template.
-*/
-pub enum Part<'a> {
-    /**
-    A fragment of text.
-    */
-    Text(&'a str),
-    /**
-    A replacement expression.
-    */
-    Hole(FieldValue),
-}
-
 impl<'a> fmt::Debug for Part<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
@@ -77,7 +86,7 @@ impl<'a> fmt::Debug for Part<'a> {
     }
 }
 
-impl<'a> Args<'a> {
+impl<'a> Template<'a> {
     /**
     Try to parse a template into its parts.
     */
@@ -214,8 +223,8 @@ impl<'a> Args<'a> {
             }
         }
 
-        Ok(Args {
-            template: input,
+        Ok(Template {
+            raw: input,
             parts,
         })
     }
@@ -279,16 +288,16 @@ mod tests {
         ];
 
         for (template, expected) in cases {
-            let actual = match Args::parse(template) {
-                Ok(args) => args,
+            let actual = match Template::parse(template) {
+                Ok(template) => template,
                 Err(e) => panic!("failed to parse {:?}: {}", template, e),
             };
 
             assert_eq!(
                 format!(
                     "{:?}",
-                    Args {
-                        template,
+                    Template {
+                        raw: template,
                         parts: expected
                     }
                 ),
@@ -315,9 +324,9 @@ mod tests {
         ];
 
         for (template, expected) in cases {
-            let actual = match Args::parse(template) {
+            let actual = match Template::parse(template) {
                 Err(e) => e,
-                Ok(args) => panic!("parsing should've failed but produced {:?}", args),
+                Ok(template) => panic!("parsing should've failed but produced {:?}", template),
             };
 
             assert_eq!(

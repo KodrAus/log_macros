@@ -10,7 +10,7 @@ proc-macro = true
 [workspace]
 members = [
     "private",
-    "args",
+    "template",
 ]
 
 [dependencies.proc-macro2]
@@ -26,8 +26,8 @@ features = ["full", "extra-traits"]
 [dependencies.log_macros_private]
 path = "private"
 
-[dependencies.log_macros_args]
-path = "args"
+[dependencies.log_macros_template]
+path = "template"
 
 [dev-dependencies.trybuild]
 version = "1"

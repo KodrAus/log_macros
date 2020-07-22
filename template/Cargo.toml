@@ -1,5 +1,5 @@
 [package]
-name = "log_macros_args"
+name = "log_macros_template"
 version = "0.1.0"
 authors = ["Ashley Mannix <ashleymannix@live.com.au>"]
 edition = "2018"

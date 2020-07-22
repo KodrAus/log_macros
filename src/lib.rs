@@ -13,9 +13,7 @@ Logging statements.
 */
 #[proc_macro]
 pub fn log(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    let input = TokenStream::from(item);
-
-    proc_macro::TokenStream::from(log::expand(input))
+    proc_macro::TokenStream::from(log::expand(TokenStream::from(item)))
 }
 
 /**
@@ -26,12 +24,9 @@ pub fn debug(
     attr: proc_macro::TokenStream,
     item: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {
-    let attr = TokenStream::from(attr);
-    let expr = TokenStream::from(item);
-
     proc_macro::TokenStream::from(capture::expand(
-        attr,
-        expr,
+        TokenStream::from(attr),
+        TokenStream::from(item),
         quote!(__private_log_capture_from_debug),
     ))
 }
@@ -44,12 +39,9 @@ pub fn display(
     attr: proc_macro::TokenStream,
     item: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {
-    let attr = TokenStream::from(attr);
-    let expr = TokenStream::from(item);
-
     proc_macro::TokenStream::from(capture::expand(
-        attr,
-        expr,
+        TokenStream::from(attr),
+        TokenStream::from(item),
         quote!(__private_log_capture_from_display),
     ))
 }

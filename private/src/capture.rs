@@ -2,20 +2,29 @@ use std::fmt;
 
 use log::kv;
 
+/**
+Similar to `log`'s `ToValue` trait, but with a generic pivot parameter.
+
+The parameter lets us choose the way values are captured, since many
+types can be captured in lots of different ways.
+*/
 pub trait Capture<T: ?Sized> {
     fn capture(&self) -> kv::Value;
 }
 
-pub type WithDefault = FromDisplay;
+/**
+The default capturing method is with the `Value::capture_display` method.
+*/
+pub type WithDefault = CaptureDisplay;
 
 extern "C" {
-    pub type FromDisplay;
+    pub type CaptureDisplay;
     pub type AsDisplay;
-    pub type FromDebug;
+    pub type CaptureDebug;
     pub type AsDebug;
 }
 
-impl<T> Capture<FromDisplay> for T
+impl<T> Capture<CaptureDisplay> for T
 where
     T: fmt::Display + 'static,
 {
@@ -33,7 +42,7 @@ where
     }
 }
 
-impl<T> Capture<FromDebug> for T
+impl<T> Capture<CaptureDebug> for T
 where
     T: fmt::Debug + 'static,
 {
@@ -60,14 +69,15 @@ impl<T: ?Sized> Capture<T> for str {
 /**
 An API to the specialized `Capture` trait for consuming in a macro.
 
-This trait serves a few purposes in the private macro API:
+This trait is a bit weird looking. It's shaped to serve a few purposes
+in the private macro API:
 
 - It supports auto-ref so that something like a `u64` or `&str` can be
 captured using the same `x.method()` syntax.
 - It uses `Self` bounds on each method, and is unconditionally implemented
 so that when a bound isn't satisfied we get a more accurate type error.
 - It uses clumsily uglified names that are unlikely to clash in non-hygeinic
-contexts. (We're expecting non-hygeinic spans to support value interpolation)
+contexts. (We're expecting non-hygeinic spans to support value interpolation).
 */
 pub trait __PrivateLogCapture {
     fn __private_log_capture_with_default(&self) -> kv::Value
@@ -79,14 +89,14 @@ pub trait __PrivateLogCapture {
 
     fn __private_log_capture_from_display(&self) -> kv::Value
     where
-        Self: Capture<FromDisplay>,
+        Self: Capture<CaptureDisplay>,
     {
         Capture::capture(self)
     }
 
     fn __private_log_capture_from_debug(&self) -> kv::Value
     where
-        Self: Capture<FromDebug>,
+        Self: Capture<CaptureDebug>,
     {
         Capture::capture(self)
     }
