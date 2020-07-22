@@ -6,6 +6,7 @@ mod capture;
 #[doc(hidden)]
 pub mod __private {
     pub use crate::capture::__PrivateLogCapture;
+    pub use log::kv::Value;
 }
 
 #[cfg(test)]

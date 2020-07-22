@@ -19,6 +19,10 @@ version = "1"
 [dependencies.quote]
 version = "1"
 
+[dependencies.syn]
+version = "1"
+features = ["full", "extra-traits"]
+
 [dependencies.log_macros_private]
 path = "private"
 

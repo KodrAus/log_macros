@@ -1,7 +1,7 @@
 use std::{fmt, iter::Peekable, str::CharIndices};
 
 use quote::ToTokens;
-use syn::Expr;
+use syn::FieldValue;
 use thiserror::Error;
 
 /**
@@ -65,7 +65,7 @@ pub enum Part<'a> {
     /**
     A replacement expression.
     */
-    Hole(Expr),
+    Hole(FieldValue),
 }
 
 impl<'a> fmt::Debug for Part<'a> {
@@ -240,8 +240,20 @@ mod tests {
                 vec![text("Hello "), hole("#[log::debug] world"), text(" 🎈📌")],
             ),
             (
-                "Hello {#[log::debug] {world}} 🎈📌",
-                vec![text("Hello "), hole("#[log::debug] {world}"), text(" 🎈📌")],
+                "Hello {#[log::debug] world: 42} 🎈📌",
+                vec![
+                    text("Hello "),
+                    hole("#[log::debug] world: 42"),
+                    text(" 🎈📌"),
+                ],
+            ),
+            (
+                "Hello {#[log::debug] world: \"is text\"} 🎈📌",
+                vec![
+                    text("Hello "),
+                    hole("#[log::debug] world: \"is text\""),
+                    text(" 🎈📌"),
+                ],
             ),
             (
                 "{Hello} {world}",

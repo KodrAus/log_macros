@@ -8,7 +8,7 @@ pub trait Capture<T: ?Sized> {
 
 pub type WithDefault = FromDisplay;
 
-extern {
+extern "C" {
     pub type FromDisplay;
     pub type AsDisplay;
     pub type FromDebug;
@@ -20,7 +20,7 @@ where
     T: fmt::Display + 'static,
 {
     default fn capture(&self) -> kv::Value {
-        kv::Value::from_display(self)
+        kv::Value::capture_display(self)
     }
 }
 
@@ -38,7 +38,7 @@ where
     T: fmt::Debug + 'static,
 {
     default fn capture(&self) -> kv::Value {
-        kv::Value::from_debug(self)
+        kv::Value::capture_debug(self)
     }
 }
 

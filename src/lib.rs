@@ -5,19 +5,53 @@ extern crate quote;
 
 use proc_macro2::TokenStream;
 
+mod log;
+mod capture;
+
+/**
+Logging statements.
+*/
 #[proc_macro]
 pub fn log(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let input = TokenStream::from(item);
 
-    let output = expand_log(input);
-
-    proc_macro::TokenStream::from(output)
+    proc_macro::TokenStream::from(log::expand(input))
 }
 
-fn expand_log(_: TokenStream) -> TokenStream {
-    quote! {
-        panic!("lol")
-    }
+/**
+Capture a key-value pair using its `Debug` implementation.
+*/
+#[proc_macro_attribute]
+pub fn debug(
+    attr: proc_macro::TokenStream,
+    item: proc_macro::TokenStream,
+) -> proc_macro::TokenStream {
+    let attr = TokenStream::from(attr);
+    let expr = TokenStream::from(item);
+
+    proc_macro::TokenStream::from(capture::expand(
+        attr,
+        expr,
+        quote!(__private_log_capture_from_debug),
+    ))
+}
+
+/**
+Capture a key-value pair using its `Display` implementation.
+*/
+#[proc_macro_attribute]
+pub fn display(
+    attr: proc_macro::TokenStream,
+    item: proc_macro::TokenStream,
+) -> proc_macro::TokenStream {
+    let attr = TokenStream::from(attr);
+    let expr = TokenStream::from(item);
+
+    proc_macro::TokenStream::from(capture::expand(
+        attr,
+        expr,
+        quote!(__private_log_capture_from_display),
+    ))
 }
 
 #[cfg(test)]
