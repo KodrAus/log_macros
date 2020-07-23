@@ -1,3 +1,5 @@
+> This code has been moved to https://github.com/KodrAus/antlog
+
 # `log_macros`
 
 This repository is an experimental set of macros for logging in Rust.
